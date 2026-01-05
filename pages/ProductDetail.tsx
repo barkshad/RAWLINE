@@ -1,10 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProductByHandle } from '../services/productService';
 import { getCloudinaryUrl } from '../services/cloudinaryService';
 import { getFitAdvice } from '../services/geminiService';
 import { CartItem, Product } from '../types';
+import { AnimatedButton } from '../components/ui/AnimatedButton';
+import { Reveal } from '../components/ui/Reveal';
+import { FADE_UP } from '../constants/motion';
 
 interface ProductDetailProps {
   onAddToCart: (item: CartItem) => void;
@@ -33,19 +37,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
   if (loading) {
     return (
       <main className="min-h-screen pt-32 px-6 md:px-12 flex justify-center items-center">
-        <div className="w-12 h-12 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border border-black/10 border-t-black rounded-full animate-spin"></div>
       </main>
     );
   }
 
-  if (!product) {
-    return (
-      <div className="min-h-screen pt-32 px-12">
-        <p className="uppercase tracking-widest text-sm opacity-60">Product not found.</p>
-        <Link to="/shop" className="text-xs uppercase font-bold underline mt-4 block tracking-widest">Back to Shop</Link>
-      </div>
-    );
-  }
+  if (!product) return null;
 
   const handleAskAI = async () => {
     if (!userDetails.trim()) return;
@@ -55,50 +52,47 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
     setIsAskingAI(false);
   };
 
-  const handleAddToCart = () => {
-    if (!selectedSize) return alert('Please select a size');
-    onAddToCart({
-      product,
-      size: selectedSize,
-      quantity: 1
-    });
-  };
-
   return (
-    <main className="min-h-screen pt-32 px-6 md:px-12 pb-20">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        {/* Images */}
-        <div className="space-y-6">
+    <main className="min-h-screen pt-40 px-6 md:px-12 pb-32 max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        
+        {/* Visual Archive */}
+        <div className="lg:col-span-7 space-y-12">
           {product.images.map((publicId, i) => (
-            <div key={i} className="aspect-[3/4] bg-charcoal/5">
-              <img 
-                src={getCloudinaryUrl(publicId, { width: 1200 })} 
-                alt={`${product.title} detail ${i}`} 
-                className="w-full h-full object-cover filter grayscale" 
-              />
-            </div>
+            <Reveal key={i} delay={i * 0.1}>
+              <div className="aspect-[3/4] bg-charcoal/5 relative overflow-hidden shadow-2xl">
+                <motion.img 
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+                  src={getCloudinaryUrl(publicId, { width: 1600 })} 
+                  alt={`${product.title} asset ${i}`} 
+                  className="w-full h-full object-cover filter grayscale" 
+                />
+              </div>
+            </Reveal>
           ))}
         </div>
 
-        {/* Info */}
-        <div className="lg:sticky lg:top-32 h-fit space-y-12">
-          <header className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tightest uppercase leading-none">{product.title}</h1>
-            <p className="text-xl font-medium">${product.price}</p>
-          </header>
+        {/* Narrative & Controls */}
+        <div className="lg:col-span-5 lg:sticky lg:top-40 h-fit space-y-16">
+          <motion.header variants={FADE_UP} initial="initial" animate="animate" className="space-y-6">
+            <h1 className="text-6xl font-bold tracking-tightest uppercase leading-[0.9]">{product.title}</h1>
+            <p className="text-2xl font-light opacity-60 tracking-tight">${product.price}</p>
+          </motion.header>
 
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-40">Select Size</h3>
-              <div className="flex flex-wrap gap-3">
+          <Reveal delay={0.2} className="space-y-10">
+            <div className="space-y-6">
+              <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-30">Selection</h3>
+              <div className="flex flex-wrap gap-4">
                 {product.sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-6 py-3 text-sm font-medium border transition-all ${
+                    className={`min-w-[70px] py-4 text-[10px] font-bold tracking-widest border transition-all duration-500 ${
                       selectedSize === size 
-                      ? 'border-black bg-black text-bone' 
-                      : 'border-black/10 hover:border-black/40'
+                      ? 'border-black bg-black text-bone shadow-lg scale-105' 
+                      : 'border-black/5 hover:border-black/40'
                     }`}
                   >
                     {size}
@@ -107,60 +101,66 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
               </div>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              className="w-full py-5 bg-black text-bone text-sm uppercase tracking-[0.2em] font-bold hover:bg-black/90 transition-colors"
+            <AnimatedButton
+              onClick={() => selectedSize ? onAddToCart({ product, size: selectedSize, quantity: 1 }) : alert('Select Size')}
+              className="w-full"
             >
-              Add to Bag
-            </button>
-          </div>
+              Add to Archive
+            </AnimatedButton>
+          </Reveal>
 
-          <div className="space-y-10 pt-10 border-t border-black/5">
-            <section className="space-y-2">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-40">Description</h3>
-              <p className="text-sm leading-relaxed opacity-80">{product.description}</p>
-            </section>
+          <Reveal delay={0.4} className="space-y-12 pt-12 border-t border-black/5">
+            <div className="space-y-4">
+              <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-30">Architecture</h3>
+              <p className="text-sm leading-relaxed opacity-60 font-light max-w-lg">{product.description}</p>
+            </div>
 
-            <section className="space-y-2">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-40">Fit & Material</h3>
-              <ul className="text-sm space-y-1 opacity-80">
-                <li><span className="font-bold opacity-60">Fabric:</span> {product.fabric}</li>
-                <li><span className="font-bold opacity-60">Fit:</span> {product.fit}</li>
-              </ul>
-            </section>
+            <div className="grid grid-cols-2 gap-10">
+              <div className="space-y-2">
+                <h3 className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30">Fabric</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest">{product.fabric}</p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30">Fit</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest">{product.fit}</p>
+              </div>
+            </div>
 
-            {/* AI Fit Assistant */}
-            <section className="p-6 bg-black/5 rounded-sm space-y-4">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-60 flex items-center">
-                <span className="w-2 h-2 bg-black rounded-full mr-2 animate-pulse"></span>
-                Fit Assistant
-              </h3>
-              <p className="text-xs opacity-60 italic">Describe your typical size or how you like things to fit.</p>
+            {/* AI Assistant - Editorial Glass Style */}
+            <div className="p-8 glass space-y-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-1.5 h-1.5 bg-black rounded-full animate-brand-glow"></div>
+                <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold">Fit Inquiry</h3>
+              </div>
+              
               <textarea
                 value={userDetails}
                 onChange={(e) => setUserDetails(e.target.value)}
-                placeholder="e.g. I am 6ft tall, prefer things oversized."
-                className="w-full bg-transparent border-b border-black/20 focus:border-black outline-none py-2 text-sm resize-none h-20 placeholder:opacity-40"
+                placeholder="Height, weight, preference..."
+                className="w-full bg-transparent border-b border-black/10 focus:border-black outline-none py-3 text-xs tracking-wider placeholder:opacity-20 transition-all h-16 resize-none"
               />
+              
               <button 
                 onClick={handleAskAI}
                 disabled={isAskingAI || !userDetails.trim()}
-                className="text-[10px] uppercase tracking-widest font-bold flex items-center hover:opacity-50 disabled:opacity-20 transition-opacity"
+                className="text-[9px] uppercase tracking-[0.3em] font-bold hover:opacity-50 disabled:opacity-20 transition-all block w-full text-left"
               >
-                {isAskingAI ? 'Consulting...' : 'Get Advice'}
+                {isAskingAI ? 'Consulting Archive...' : 'Request Insight'}
               </button>
-              {fitAdvice && (
-                <div className="mt-4 p-4 bg-white/50 border-l-2 border-black text-sm leading-relaxed">
-                  {fitAdvice}
-                </div>
-              )}
-            </section>
-
-            <section className="space-y-2">
-              <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold opacity-40">Care</h3>
-              <p className="text-sm opacity-80">{product.care}</p>
-            </section>
-          </div>
+              
+              <AnimatePresence>
+                {fitAdvice && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="pt-4 text-xs italic opacity-60 leading-relaxed border-t border-black/5"
+                  >
+                    {fitAdvice}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </Reveal>
         </div>
       </div>
     </main>
