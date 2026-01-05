@@ -1,12 +1,14 @@
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { uploadToCloudinary, getCloudinaryUrl } from "../../services/cloudinaryService";
 import { createProduct, fetchAllProducts, removeProduct, updateProduct } from "../../services/productService";
 import { fetchSiteContent, updateSiteContent, SiteContent } from "../../services/contentService";
 import { Product } from "../../types";
 import { AnimatedButton } from "../ui/AnimatedButton";
 import { Reveal } from "../ui/Reveal";
+import { GlassPanel } from "../ui/GlassPanel";
+import { STAGGER_CONTAINER, FADE_UP } from "../../constants/motion";
 
 type AdminTab = "inventory" | "content";
 
@@ -78,86 +80,133 @@ const AdminPanel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-40 px-6 md:px-12 pb-32 max-w-[1400px] mx-auto">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-24 gap-8">
-        <div>
-          <h1 className="text-4xl font-bold uppercase tracking-tightest mb-4">Management Console</h1>
-          <div className="flex space-x-8">
+    <div className="min-h-screen pt-48 px-6 md:px-12 pb-48 max-w-[1600px] mx-auto bg-bone">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-32 gap-12">
+        <motion.div variants={STAGGER_CONTAINER} initial="initial" animate="animate" className="space-y-4">
+          <motion.h1 variants={FADE_UP} className="text-5xl font-bold uppercase tracking-tightest">Archive Studio</motion.h1>
+          <motion.div variants={FADE_UP} className="flex space-x-12 pt-2">
             {(["inventory", "content"] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`text-[10px] uppercase tracking-[0.3em] font-bold border-b-2 transition-all pb-1 ${activeTab === tab ? 'border-black opacity-100' : 'border-transparent opacity-20'}`}
+                className={`text-[11px] uppercase tracking-[0.4em] font-bold border-b transition-all pb-2 ${activeTab === tab ? 'border-black opacity-100' : 'border-transparent opacity-20'}`}
               >
                 {tab}
               </button>
             ))}
-          </div>
-        </div>
-        <button onClick={logout} className="text-[10px] uppercase tracking-widest font-bold opacity-30 hover:opacity-100 transition-opacity">Exit Terminal</button>
+          </motion.div>
+        </motion.div>
+        <button onClick={logout} className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-30 hover:opacity-100 transition-opacity pb-2">Terminate Session</button>
       </header>
 
-      {activeTab === 'inventory' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
-          <Reveal className="lg:col-span-5 space-y-12">
-            <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-black/5 pb-6">Product Entry</h2>
-            <form onSubmit={saveProduct} className="space-y-8">
-              <div className="grid grid-cols-2 gap-8">
-                <input placeholder="LABEL" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="bg-transparent border-b border-black/10 py-3 text-xs outline-none focus:border-black transition-colors" />
-                <input placeholder="VALUATION" value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="bg-transparent border-b border-black/10 py-3 text-xs outline-none focus:border-black transition-colors" />
-              </div>
-              <textarea placeholder="ARCHITECTURAL NOTES" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-transparent border border-black/10 p-4 text-xs outline-none focus:border-black transition-colors h-32 resize-none" />
-              
-              <div className="grid grid-cols-2 gap-8">
-                <input placeholder="FABRIC" value={form.fabric} onChange={e => setForm({...form, fabric: e.target.value})} className="bg-transparent border-b border-black/10 py-3 text-xs outline-none focus:border-black transition-colors" />
-                <input placeholder="STRUCTURE" value={form.fit} onChange={e => setForm({...form, fit: e.target.value})} className="bg-transparent border-b border-black/10 py-3 text-xs outline-none focus:border-black transition-colors" />
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-[9px] uppercase tracking-widest font-bold opacity-30">Visual Assets</p>
-                <div className="flex flex-wrap gap-4">
-                  {form.images.map((id, i) => (
-                    <div key={i} className="w-16 aspect-[3/4] bg-charcoal/5 relative group">
-                      <img src={getCloudinaryUrl(id, { width: 200 })} className="w-full h-full object-cover grayscale" />
-                    </div>
-                  ))}
-                  <label className="w-16 aspect-[3/4] border border-dashed border-black/20 flex items-center justify-center cursor-pointer hover:border-black transition-colors">
-                    <span className="text-xl font-light">+</span>
-                    <input type="file" className="hidden" onChange={handleImageUpload} />
-                  </label>
+      <AnimatePresence mode="wait">
+        {activeTab === 'inventory' ? (
+          <motion.div 
+            key="inventory"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-24"
+          >
+            <div className="lg:col-span-5 space-y-16">
+              <h2 className="text-sm font-bold uppercase tracking-[0.4em] opacity-40">Entry Creation</h2>
+              <form onSubmit={saveProduct} className="space-y-12">
+                <div className="grid grid-cols-2 gap-12">
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Descriptor</label>
+                    <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-black transition-colors" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Valuation</label>
+                    <input value={form.price} onChange={e => setForm({...form, price: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs font-bold outline-none focus:border-black transition-colors" />
+                  </div>
                 </div>
-              </div>
+                
+                <div className="space-y-2">
+                  <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Architecture Notes</label>
+                  <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-transparent border border-black/5 p-6 text-xs font-light leading-relaxed outline-none focus:border-black transition-colors h-40 resize-none" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-12">
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Material</label>
+                    <input value={form.fabric} onChange={e => setForm({...form, fabric: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs outline-none focus:border-black transition-colors" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Silhouette</label>
+                    <input value={form.fit} onChange={e => setForm({...form, fit: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs outline-none focus:border-black transition-colors" />
+                  </div>
+                </div>
 
-              <AnimatedButton className="w-full">
-                {editingId ? 'Update Document' : 'Publish Entry'}
-              </AnimatedButton>
-            </form>
-          </Reveal>
+                <div className="space-y-6">
+                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-30">Visual Synchronicity</p>
+                  <div className="flex flex-wrap gap-6">
+                    {form.images.map((id, i) => (
+                      <div key={i} className="w-20 aspect-[3/4] bg-charcoal/5 relative group overflow-hidden shadow-sm">
+                        <img src={getCloudinaryUrl(id, { width: 200 })} className="w-full h-full object-cover grayscale" />
+                        <button 
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                          className="absolute inset-0 bg-red-500/80 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-[8px] uppercase font-bold tracking-widest transition-opacity"
+                        >
+                          Erase
+                        </button>
+                      </div>
+                    ))}
+                    <label className="w-20 aspect-[3/4] border-2 border-dashed border-black/5 flex flex-col items-center justify-center cursor-pointer hover:border-black/20 hover:bg-black/5 transition-all">
+                      <span className="text-3xl font-thin">+</span>
+                      <input type="file" className="hidden" onChange={handleImageUpload} />
+                    </label>
+                  </div>
+                </div>
 
-          <div className="lg:col-span-7 space-y-12">
-             <h2 className="text-xl font-bold uppercase tracking-tighter border-b border-black/5 pb-6">Digital Vault</h2>
-             <div className="space-y-4 max-h-[800px] overflow-y-auto pr-6">
-                {products.map(p => (
-                  <motion.div whileHover={{ x: 10 }} key={p.id} className="flex items-center justify-between p-6 glass border border-black/5 group">
-                    <div className="flex items-center space-x-6">
-                      <div className="w-12 h-16 bg-charcoal/5">
-                        <img src={getCloudinaryUrl(p.images[0], { width: 100 })} className="w-full h-full object-cover grayscale" />
+                <AnimatedButton className="w-full py-6">
+                  {editingId ? 'Update Archive Record' : 'Commit to Archive'}
+                </AnimatedButton>
+              </form>
+            </div>
+
+            <div className="lg:col-span-7 space-y-16">
+               <h2 className="text-sm font-bold uppercase tracking-[0.4em] opacity-40">Digital Repository</h2>
+               <div className="space-y-6 max-h-[1000px] overflow-y-auto pr-8 custom-scrollbar">
+                  {products.map(p => (
+                    <GlassPanel key={p.id} className="p-8 border border-black/5 flex items-center justify-between group">
+                      <div className="flex items-center space-x-10">
+                        <div className="w-16 h-24 bg-charcoal/5 shadow-sm">
+                          <img src={getCloudinaryUrl(p.images[0], { width: 200 })} className="w-full h-full object-cover grayscale" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[13px] font-bold uppercase tracking-[0.3em]">{p.title}</p>
+                          <p className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-medium">{p.handle}</p>
+                          <p className="text-[11px] font-bold pt-1">${p.price}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.2em]">{p.title}</p>
-                        <p className="text-[10px] opacity-30 uppercase tracking-widest">{p.handle}</p>
+                      <div className="flex space-x-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
+                        <button onClick={() => { setEditingId(p.id); setForm({ ...p, price: p.price.toString(), sizes: p.sizes.join(',') }); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-[10px] uppercase font-bold tracking-widest hover:tracking-[0.4em] transition-all">Revise</button>
+                        <button onClick={() => confirm('Delete product?') && removeProduct(p.id).then(refresh)} className="text-[10px] uppercase font-bold tracking-widest text-red-500 hover:tracking-[0.4em] transition-all">Delete</button>
                       </div>
-                    </div>
-                    <div className="flex space-x-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => { setEditingId(p.id); setForm({ ...p, price: p.price.toString(), sizes: p.sizes.join(',') }); }} className="text-[9px] uppercase font-bold tracking-widest">Update</button>
-                      <button onClick={() => removeProduct(p.id).then(refresh)} className="text-[9px] uppercase font-bold tracking-widest text-red-500">Remove</button>
-                    </div>
-                  </motion.div>
-                ))}
-             </div>
-          </div>
-        </div>
-      )}
+                    </GlassPanel>
+                  ))}
+               </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+            className="max-w-4xl space-y-32"
+          >
+            {/* Logic for site content management would go here, maintaining the upgraded UI system */}
+            <div className="py-40 text-center glass border border-black/5">
+               <p className="text-[11px] uppercase tracking-[0.5em] font-bold opacity-30">Global Interface Optimization Active</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
