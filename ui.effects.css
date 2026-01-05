@@ -7,99 +7,128 @@ body {
   overflow-x: hidden;
 }
 
-/* Noise Texture: Effect #14 & #39 from Master List */
+/* Noise Texture: Effect #14 */
 .noise-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   background: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.04;
+  opacity: 0.05;
   pointer-events: none;
   z-index: 9999;
 }
 
-/* Vignette: Effect #17 from Master List */
+/* Vignette: Effect #17 */
 .vignette {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.02) 100%);
+  background: radial-gradient(circle, transparent 50%, rgba(124, 139, 149, 0.03) 100%);
   pointer-events: none;
   z-index: 9998;
 }
 
-/* Glassmorphism: Effect #1 from Master List */
+/* Animated Haze Background: Effect #59 */
+.haze-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.haze-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: moveHaze 20s infinite alternate ease-in-out;
+}
+
+.haze-1 {
+  width: 60vw;
+  height: 60vw;
+  background: #A67B5B; /* Clay */
+  top: -20%;
+  left: -10%;
+}
+
+.haze-2 {
+  width: 50vw;
+  height: 50vw;
+  background: #7C8B95; /* Slate */
+  bottom: -10%;
+  right: -5%;
+  animation-delay: -5s;
+}
+
+@keyframes moveHaze {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(10%, 15%) scale(1.1); }
+}
+
+/* Glassmorphism Variants: Effect #1 & #50 */
 .glass {
-  background: rgba(245, 244, 242, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(245, 244, 242, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(17, 17, 17, 0.04);
 }
 
-/* Monochrome Gradient Border: Effect #15 from Master List */
-.gradient-border-mono {
-  position: relative;
-  background: #F5F4F2;
-}
-.gradient-border-mono::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(to right, #111, #eee, #111);
-  z-index: -1;
-  opacity: 0.1;
-  transition: opacity 0.5s ease;
-}
-.gradient-border-mono:hover::before {
-  opacity: 0.3;
+.glass-clay {
+  background: rgba(166, 123, 91, 0.05);
+  border-color: rgba(166, 123, 91, 0.1);
 }
 
-/* Animated Gradient Brand Text: Effect #22 & #215 from Master List */
+.glass-slate {
+  background: rgba(124, 139, 149, 0.05);
+  border-color: rgba(124, 139, 149, 0.1);
+}
+
+/* Color Cycle Brand Text: Effect #229 */
 .brand-gradient {
   background: linear-gradient(
     to right,
-    #111111 20%,
-    #444444 40%,
-    #444444 60%,
-    #111111 80%
+    #111111 0%,
+    #7C8B95 50%,
+    #111111 100%
   );
   background-size: 200% auto;
-  color: #000;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shine 8s linear infinite;
+  animation: shine 12s linear infinite;
 }
 
 @keyframes shine {
   to { background-position: 200% center; }
 }
 
-/* Light Sweep Button: Effect #95 & #29 from Master List */
+/* Primary Button Sweep */
 @keyframes sweep {
   0% { transform: translateX(-150%) skewX(-20deg); }
   100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.sweep-trigger:hover .sweep-effect::after {
+  animation: sweep 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 .sweep-effect::after {
   content: "";
   position: absolute;
   top: 0; left: 0;
-  width: 50%; height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  width: 40%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
   transform: skewX(-20deg);
   pointer-events: none;
 }
 
-.sweep-trigger:hover .sweep-effect::after {
-  animation: sweep 1.5s ease-in-out forwards;
-}
-
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: #F5F4F2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #111111;
+  background: #7C8B95;
 }

@@ -7,8 +7,9 @@ import { getCloudinaryUrl } from '../services/cloudinaryService';
 import { getFitAdvice } from '../services/geminiService';
 import { CartItem, Product } from '../types';
 import { AnimatedButton } from '../components/ui/AnimatedButton';
-import { Reveal } from '../components/ui/Reveal';
-import { FADE_UP } from '../constants/motion';
+import { RevealOnScroll } from '../components/ui/RevealOnScroll';
+import { GlassPanel } from '../components/ui/GlassPanel';
+import { FADE_UP, STAGGER_CONTAINER } from '../constants/motion';
 
 interface ProductDetailProps {
   onAddToCart: (item: CartItem) => void;
@@ -37,7 +38,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
   if (loading) {
     return (
       <main className="min-h-screen pt-32 px-6 md:px-12 flex justify-center items-center">
-        <div className="w-6 h-6 border border-black/10 border-t-black rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-slate/20 border-t-slate rounded-full animate-spin"></div>
       </main>
     );
   }
@@ -57,31 +58,31 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
         
         {/* Visual Archive */}
-        <div className="lg:col-span-7 space-y-12">
+        <div className="lg:col-span-7 space-y-16">
           {product.images.map((publicId, i) => (
-            <Reveal key={i} delay={i * 0.1}>
-              <div className="aspect-[3/4] bg-charcoal/5 relative overflow-hidden shadow-2xl">
+            <RevealOnScroll key={i} delay={i * 0.1}>
+              <div className="aspect-[3/4] bg-charcoal/5 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)]">
                 <motion.img 
-                  initial={{ scale: 1.1, opacity: 0 }}
+                  initial={{ scale: 1.05, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
                   src={getCloudinaryUrl(publicId, { width: 1600 })} 
                   alt={`${product.title} asset ${i}`} 
-                  className="w-full h-full object-cover filter grayscale" 
+                  className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-[1500ms]" 
                 />
               </div>
-            </Reveal>
+            </RevealOnScroll>
           ))}
         </div>
 
         {/* Narrative & Controls */}
         <div className="lg:col-span-5 lg:sticky lg:top-40 h-fit space-y-16">
           <motion.header variants={FADE_UP} initial="initial" animate="animate" className="space-y-6">
-            <h1 className="text-6xl font-bold tracking-tightest uppercase leading-[0.9]">{product.title}</h1>
-            <p className="text-2xl font-light opacity-60 tracking-tight">${product.price}</p>
+            <h1 className="text-6xl font-bold tracking-tightest uppercase leading-[0.9] text-obsidian">{product.title}</h1>
+            <p className="text-2xl font-light text-clay tracking-tight">${product.price}</p>
           </motion.header>
 
-          <Reveal delay={0.2} className="space-y-10">
+          <motion.div variants={STAGGER_CONTAINER} initial="initial" animate="animate" className="space-y-10">
             <div className="space-y-6">
               <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-30">Selection</h3>
               <div className="flex flex-wrap gap-4">
@@ -91,8 +92,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
                     onClick={() => setSelectedSize(size)}
                     className={`min-w-[70px] py-4 text-[10px] font-bold tracking-widest border transition-all duration-500 ${
                       selectedSize === size 
-                      ? 'border-black bg-black text-bone shadow-lg scale-105' 
-                      : 'border-black/5 hover:border-black/40'
+                      ? 'border-clay bg-clay text-bone shadow-lg scale-105' 
+                      : 'border-black/5 hover:border-slate/40 hover:text-slate'
                     }`}
                   >
                     {size}
@@ -107,9 +108,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
             >
               Add to Archive
             </AnimatedButton>
-          </Reveal>
+          </motion.div>
 
-          <Reveal delay={0.4} className="space-y-12 pt-12 border-t border-black/5">
+          <div className="space-y-12 pt-12 border-t border-black/5">
             <div className="space-y-4">
               <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-30">Architecture</h3>
               <p className="text-sm leading-relaxed opacity-60 font-light max-w-lg">{product.description}</p>
@@ -118,32 +119,32 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
             <div className="grid grid-cols-2 gap-10">
               <div className="space-y-2">
                 <h3 className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30">Fabric</h3>
-                <p className="text-[11px] font-bold uppercase tracking-widest">{product.fabric}</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-obsidian">{product.fabric}</p>
               </div>
               <div className="space-y-2">
                 <h3 className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-30">Fit</h3>
-                <p className="text-[11px] font-bold uppercase tracking-widest">{product.fit}</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-obsidian">{product.fit}</p>
               </div>
             </div>
 
-            {/* AI Assistant - Editorial Glass Style */}
-            <div className="p-8 glass space-y-6">
+            {/* AI Assistant - Effect #50 (Clay Tinted Glass) */}
+            <GlassPanel variant="clay" className="p-10 space-y-8">
               <div className="flex items-center space-x-3">
-                <div className="w-1.5 h-1.5 bg-black rounded-full animate-brand-glow"></div>
-                <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold">Fit Inquiry</h3>
+                <div className="w-2 h-2 bg-clay rounded-full animate-pulse"></div>
+                <h3 className="text-[10px] uppercase tracking-[0.5em] font-bold text-obsidian">Fit Advisor</h3>
               </div>
               
               <textarea
                 value={userDetails}
                 onChange={(e) => setUserDetails(e.target.value)}
-                placeholder="Height, weight, preference..."
-                className="w-full bg-transparent border-b border-black/10 focus:border-black outline-none py-3 text-xs tracking-wider placeholder:opacity-20 transition-all h-16 resize-none"
+                placeholder="Share your proportions (e.g. 6'2, athletic build)..."
+                className="w-full bg-transparent border-b border-clay/20 focus:border-clay outline-none py-4 text-xs tracking-wider placeholder:text-clay/30 transition-all h-20 resize-none"
               />
               
               <button 
                 onClick={handleAskAI}
                 disabled={isAskingAI || !userDetails.trim()}
-                className="text-[9px] uppercase tracking-[0.3em] font-bold hover:opacity-50 disabled:opacity-20 transition-all block w-full text-left"
+                className="text-[9px] uppercase tracking-[0.4em] font-bold hover:text-clay disabled:opacity-30 transition-all block w-full text-left"
               >
                 {isAskingAI ? 'Consulting Archive...' : 'Request Insight'}
               </button>
@@ -153,14 +154,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
                   <motion.div 
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="pt-4 text-xs italic opacity-60 leading-relaxed border-t border-black/5"
+                    className="pt-6 text-xs italic text-clay leading-relaxed border-t border-clay/10"
                   >
                     {fitAdvice}
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          </Reveal>
+            </GlassPanel>
+          </div>
         </div>
       </div>
     </main>

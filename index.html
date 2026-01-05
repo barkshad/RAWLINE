@@ -17,7 +17,12 @@
             colors: {
               black: "#111111",
               bone: "#F5F4F2",
-              charcoal: "#333333"
+              charcoal: "#333333",
+              // Architectural Accent Palette
+              clay: "#A67B5B",     /* Warm earth */
+              slate: "#7C8B95",    /* Cool industrial */
+              moss: "#747F6B",     /* Deep organic */
+              obsidian: "#1A1A1A"
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
@@ -47,10 +52,13 @@
     </script>
   </head>
   <body>
-    <!-- Global noise texture for tactile editorial feel -->
     <div class="noise-overlay"></div>
-    <!-- Subtle vignette for focal depth -->
     <div class="vignette"></div>
+    <!-- Animated Haze Background (Effect #59) -->
+    <div class="haze-container">
+      <div class="haze-blob haze-1"></div>
+      <div class="haze-blob haze-2"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
