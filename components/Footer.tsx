@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -22,8 +23,9 @@ const Footer: React.FC = () => {
           <a href="#" className="hover:opacity-50 transition-opacity w-fit">Contact</a>
         </div>
       </div>
-      <div className="mt-20 text-[10px] uppercase tracking-[0.2em] opacity-30">
-        &copy; {new Date().getFullYear()} RAWLINE STUDIO. ALL RIGHTS RESERVED.
+      <div className="mt-20 flex justify-between items-center text-[10px] uppercase tracking-[0.2em] opacity-30">
+        <span>&copy; {new Date().getFullYear()} RAWLINE STUDIO. ALL RIGHTS RESERVED.</span>
+        <Link to="/admin" className="hover:opacity-100 transition-opacity uppercase font-bold tracking-widest">Admin</Link>
       </div>
     </footer>
   );

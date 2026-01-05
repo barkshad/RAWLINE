@@ -8,6 +8,7 @@ import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Cart from './pages/Cart';
+import Admin from './pages/Admin';
 import { CartItem } from './types';
 
 // ScrollToTop component to reset scroll position on route change
@@ -77,6 +78,7 @@ const App: React.FC = () => {
                 />
               } 
             />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </div>
 

@@ -1,5 +1,5 @@
 
-import { collection, getDocs, query, where, limit } from "firebase/firestore";
+import { collection, getDocs, query, where, limit, addDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { Product } from "../types";
 
@@ -28,5 +28,27 @@ export async function fetchProductByHandle(handle: string): Promise<Product | nu
   } catch (error) {
     console.error("Error fetching product by handle:", error);
     return null;
+  }
+}
+
+export async function createProduct(product: Omit<Product, 'id'>) {
+  try {
+    const docRef = await addDoc(collection(db, PRODUCTS_COLLECTION), {
+      ...product,
+      createdAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw error;
+  }
+}
+
+export async function removeProduct(productId: string) {
+  try {
+    await deleteDoc(doc(db, PRODUCTS_COLLECTION, productId));
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
   }
 }
