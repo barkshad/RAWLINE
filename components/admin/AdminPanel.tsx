@@ -6,7 +6,6 @@ import { createProduct, fetchAllProducts, removeProduct, updateProduct } from ".
 import { fetchSiteContent, updateSiteContent, SiteContent } from "../../services/contentService";
 import { Product } from "../../types";
 import { AnimatedButton } from "../ui/AnimatedButton";
-import { Reveal } from "../ui/Reveal";
 import { GlassPanel } from "../ui/GlassPanel";
 import { STAGGER_CONTAINER, FADE_UP } from "../../constants/motion";
 
@@ -106,7 +105,7 @@ const AdminPanel: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+            transition={{ duration: 0.8 }}
             className="grid grid-cols-1 lg:grid-cols-12 gap-24"
           >
             <div className="lg:col-span-5 space-y-16">
@@ -128,19 +127,8 @@ const AdminPanel: React.FC = () => {
                   <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-transparent border border-black/5 p-6 text-xs font-light leading-relaxed outline-none focus:border-black transition-colors h-40 resize-none" />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-12">
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Material</label>
-                    <input value={form.fabric} onChange={e => setForm({...form, fabric: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs outline-none focus:border-black transition-colors" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold opacity-30">Silhouette</label>
-                    <input value={form.fit} onChange={e => setForm({...form, fit: e.target.value})} className="w-full bg-transparent border-b border-black/10 py-4 text-xs outline-none focus:border-black transition-colors" />
-                  </div>
-                </div>
-
                 <div className="space-y-6">
-                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-30">Visual Synchronicity</p>
+                  <p className="text-[9px] uppercase tracking-widest font-bold opacity-30">Visual Assets</p>
                   <div className="flex flex-wrap gap-6">
                     {form.images.map((id, i) => (
                       <div key={i} className="w-20 aspect-[3/4] bg-charcoal/5 relative group overflow-hidden shadow-sm">
@@ -154,27 +142,27 @@ const AdminPanel: React.FC = () => {
                         </button>
                       </div>
                     ))}
-                    <label className="w-20 aspect-[3/4] border-2 border-dashed border-black/5 flex flex-col items-center justify-center cursor-pointer hover:border-black/20 hover:bg-black/5 transition-all">
+                    <label className="w-20 aspect-[3/4] border-2 border-dashed border-black/5 flex flex-col items-center justify-center cursor-pointer hover:bg-black/5 transition-all">
                       <span className="text-3xl font-thin">+</span>
                       <input type="file" className="hidden" onChange={handleImageUpload} />
                     </label>
                   </div>
                 </div>
 
-                <AnimatedButton className="w-full py-6">
-                  {editingId ? 'Update Archive Record' : 'Commit to Archive'}
+                <AnimatedButton className="w-full">
+                  {editingId ? 'Update Record' : 'Commit Entry'}
                 </AnimatedButton>
               </form>
             </div>
 
             <div className="lg:col-span-7 space-y-16">
                <h2 className="text-sm font-bold uppercase tracking-[0.4em] opacity-40">Digital Repository</h2>
-               <div className="space-y-6 max-h-[1000px] overflow-y-auto pr-8 custom-scrollbar">
+               <div className="space-y-6 max-h-[1000px] overflow-y-auto pr-8">
                   {products.map(p => (
                     <GlassPanel key={p.id} className="p-8 border border-black/5 flex items-center justify-between group">
                       <div className="flex items-center space-x-10">
                         <div className="w-16 h-24 bg-charcoal/5 shadow-sm">
-                          <img src={getCloudinaryUrl(p.images[0], { width: 200 })} className="w-full h-full object-cover grayscale" />
+                          {p.images?.[0] && <img src={getCloudinaryUrl(p.images[0], { width: 200 })} className="w-full h-full object-cover grayscale" />}
                         </div>
                         <div className="space-y-1">
                           <p className="text-[13px] font-bold uppercase tracking-[0.3em]">{p.title}</p>
@@ -182,7 +170,7 @@ const AdminPanel: React.FC = () => {
                           <p className="text-[11px] font-bold pt-1">${p.price}</p>
                         </div>
                       </div>
-                      <div className="flex space-x-10 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="flex space-x-8 opacity-20 group-hover:opacity-100 transition-opacity duration-500">
                         <button onClick={() => { setEditingId(p.id); setForm({ ...p, price: p.price.toString(), sizes: p.sizes.join(',') }); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="text-[10px] uppercase font-bold tracking-widest hover:tracking-[0.4em] transition-all">Revise</button>
                         <button onClick={() => confirm('Delete product?') && removeProduct(p.id).then(refresh)} className="text-[10px] uppercase font-bold tracking-widest text-red-500 hover:tracking-[0.4em] transition-all">Delete</button>
                       </div>
@@ -196,14 +184,12 @@ const AdminPanel: React.FC = () => {
             key="content"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
             className="max-w-4xl space-y-32"
           >
-            {/* Logic for site content management would go here, maintaining the upgraded UI system */}
-            <div className="py-40 text-center glass border border-black/5">
-               <p className="text-[11px] uppercase tracking-[0.5em] font-bold opacity-30">Global Interface Optimization Active</p>
-            </div>
+            <GlassPanel className="p-20 text-center">
+               <p className="text-[11px] uppercase tracking-[0.5em] font-bold opacity-30">Global Site Content Management Interface</p>
+               <p className="text-[10px] mt-4 opacity-20">Editorial blocks are synchronized with high-availability archive documents.</p>
+            </GlassPanel>
           </motion.div>
         )}
       </AnimatePresence>

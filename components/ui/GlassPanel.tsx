@@ -5,12 +5,17 @@ import { motion } from 'framer-motion';
 interface GlassPanelProps {
   children: React.ReactNode;
   className?: string;
+  animate?: boolean;
 }
 
-export const GlassPanel: React.FC<GlassPanelProps> = ({ children, className = "" }) => {
+export const GlassPanel: React.FC<GlassPanelProps> = ({ children, className = "", animate = true }) => {
   return (
-    <div className={`glass shadow-sm ${className}`}>
+    <motion.div
+      initial={animate ? { opacity: 0, y: 10 } : false}
+      animate={animate ? { opacity: 1, y: 0 } : false}
+      className={`glass ${className}`}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 };
