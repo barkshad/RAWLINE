@@ -1,5 +1,5 @@
 
-import { collection, getDocs, query, where, limit, addDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, query, where, limit, addDoc, doc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { Product } from "../types";
 
@@ -40,6 +40,19 @@ export async function createProduct(product: Omit<Product, 'id'>) {
     return docRef.id;
   } catch (error) {
     console.error("Error creating product:", error);
+    throw error;
+  }
+}
+
+export async function updateProduct(productId: string, updates: Partial<Product>) {
+  try {
+    const productRef = doc(db, PRODUCTS_COLLECTION, productId);
+    await updateDoc(productRef, {
+      ...updates,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
     throw error;
   }
 }
