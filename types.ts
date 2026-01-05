@@ -5,7 +5,7 @@ export interface Product {
   handle: string;
   price: number;
   description: string;
-  images: string[];
+  images: string[]; // This will now store Cloudinary public_ids
   fabric: string;
   fit: string;
   care: string;

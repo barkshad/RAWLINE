@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MOCK_PRODUCTS } from '../constants';
+import { fetchProductByHandle } from '../services/productService';
+import { getCloudinaryUrl } from '../services/cloudinaryService';
 import { getFitAdvice } from '../services/geminiService';
-import { CartItem } from '../types';
+import { CartItem, Product } from '../types';
 
 interface ProductDetailProps {
   onAddToCart: (item: CartItem) => void;
@@ -11,18 +12,37 @@ interface ProductDetailProps {
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
   const { handle } = useParams<{ handle: string }>();
-  const product = MOCK_PRODUCTS.find((p) => p.handle === handle);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [userDetails, setUserDetails] = useState('');
   const [fitAdvice, setFitAdvice] = useState<string>('');
   const [isAskingAI, setIsAskingAI] = useState(false);
 
+  useEffect(() => {
+    async function loadProduct() {
+      if (!handle) return;
+      const data = await fetchProductByHandle(handle);
+      setProduct(data);
+      setLoading(false);
+    }
+    loadProduct();
+  }, [handle]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen pt-32 px-6 md:px-12 flex justify-center items-center">
+        <div className="w-12 h-12 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+      </main>
+    );
+  }
+
   if (!product) {
     return (
       <div className="min-h-screen pt-32 px-12">
-        <p>Product not found.</p>
-        <Link to="/shop" className="underline mt-4 block">Back to Shop</Link>
+        <p className="uppercase tracking-widest text-sm opacity-60">Product not found.</p>
+        <Link to="/shop" className="text-xs uppercase font-bold underline mt-4 block tracking-widest">Back to Shop</Link>
       </div>
     );
   }
@@ -49,9 +69,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
         {/* Images */}
         <div className="space-y-6">
-          {product.images.map((img, i) => (
+          {product.images.map((publicId, i) => (
             <div key={i} className="aspect-[3/4] bg-charcoal/5">
-              <img src={img} alt={`${product.title} detail ${i}`} className="w-full h-full object-cover filter grayscale" />
+              <img 
+                src={getCloudinaryUrl(publicId, { width: 1200 })} 
+                alt={`${product.title} detail ${i}`} 
+                className="w-full h-full object-cover filter grayscale" 
+              />
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CartItem } from '../types';
+import { getCloudinaryUrl } from '../services/cloudinaryService';
 
 interface CartProps {
   items: CartItem[];
@@ -30,7 +31,11 @@ const Cart: React.FC<CartProps> = ({ items, onRemove, onUpdateQuantity }) => {
           {items.map((item, idx) => (
             <div key={`${item.product.id}-${item.size}`} className="flex gap-6 pb-12 border-b border-black/5">
               <div className="w-24 md:w-40 aspect-[3/4] bg-charcoal/5 flex-shrink-0 overflow-hidden">
-                <img src={item.product.images[0]} alt={item.product.title} className="w-full h-full object-cover grayscale" />
+                <img 
+                  src={getCloudinaryUrl(item.product.images[0], { width: 300 })} 
+                  alt={item.product.title} 
+                  className="w-full h-full object-cover grayscale" 
+                />
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
